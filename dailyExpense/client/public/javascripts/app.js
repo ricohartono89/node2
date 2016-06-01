@@ -8,4 +8,8 @@ expenses.config(['ChartJsProvider',function(ChartJsProvider){
   ChartJsProvider.setOptions('line',{
     datasetFill:false
   });
+  ChartJsProvider.setOptions('bar',{
+    beginAtZero: true
+  });
+
 }])

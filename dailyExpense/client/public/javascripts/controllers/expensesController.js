@@ -45,39 +45,63 @@ expenses.controller('mainController',function($scope,$http,$timeout,
         console.log('Error: '+error);
       });
     };
-    $scope.openEditPopUp = function(){
-      ngDialog.open({
-        template:'templates/editPopUp.html'
-      });
-    }
-$scope.showChart=function(expensesData){
-  $scope.labels = [];
-  $scope.data=[];
-  $scope.amountList=[];
-  $scope.series = ['Series A'];
-  for (var i = 0; i < expensesData.length; i++) {
-    var date = expensesData[i].transactiondate;
-    var amount = expensesData[i].amount
-    console.log(amount);
-    $scope.labels.push(date);
-    $scope.amountList.push(amount);
-  }
-  $scope.data.push($scope.amountList);
-  $scope.onClick = function (points, evt) {
-    console.log(points, evt);
-  };
 
-  // Simulate async data update
-  //$timeout(function () {
-  //  $scope.data = [
-  //    [28, 48, 40, 19, 86, 27, 90],
-  //    [65, 59, 80, 81, 56, 55, 40]
-  //  ];
-  //}, 3000);
+    $scope.editExpense = function(expense_id){
+      $http.put('/api/common/expense/'+expense_id,$scope.edit).success(function(data){
+        for (var i = 0; i < data.length; i++) {
+          data[i].transactiondate = moment(data[i].transactiondate).format('DD MMMM YYYY');
+        }
+        $scope.edit={};
+        $scope.expenseData=data;
+        $scope.showChart($scope.expenseData);
+        console.log(data);
+        $("#editModal").modal('hide');
+      }).error(function(error){
+        console.log('Error: '+error);
+      });
+    };
+
+
+    $scope.openEditPopUp = function(id){
+      $http.get('/api/common/expense/'+id).success(function(data){
+        console.log($scope.edit);
+        for (var i = 0; i < data.length; i++) {
+          data[i].transactiondate = moment(data[i].transactiondate).format('DD/MM/YYYY');
+        }
+        $scope.edit=angular.copy(data[0]);
+        console.log(data[0]);
+        $("#editModal").modal('show');
+      }).error(function(error){
+        console.log('Error: '+error);
+      })
+    };
+  $scope.showChart=function(expensesData){
+
+    $scope.labels = [];
+    $scope.data=[];
+    $scope.amountList=[];
+    $scope.series = ['Series A'];
+    for (var i = 0; i < expensesData.length; i++) {
+      var date = expensesData[i].transactiondate;
+      var amount = expensesData[i].amount
+      console.log(amount);
+      $scope.labels.push(date);
+      $scope.data.push(amount);
+    };
+    $scope.onClick = function (points, evt) {
+      console.log(points, evt);
+    };
+    var myLine = new Chart(document.getElementById("canvas").getContext("2d")).Line(lineChartData,options);
+function done() {
+    console.log('done');
+	var url=document.getElementById("canvas").toDataURL();
+	document.getElementById("url").src=url;
+
 }
+};
+
+  $scope.$on('chart-create', function (evt, chart) {
+    chart.scales["y-axis-0"].min=0;
+  });
 
 });
-
-expenses.controller('editExpenseController',function($scope,$http){
-
-})

@@ -6,24 +6,32 @@
     <link href="http://netdna.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="stylesheets/ngDialog.css" rel="stylesheet">
     <link href="stylesheets/ngDialog-theme-default.css" rel="stylesheet">
+    <link href="stylesheets/style.css" rel="stylesheet">
   </head>
   <body ng-controller="mainController">
     <div class="container">
-      <table style="width:100%">
+      <table class="table-hover" style="width:100%">
+        <title>Expenses Table</title>
         <thead>
           <tr>
-            <td>
-              Name
-            </td>
-            <td>
-              Amount
-            </td>
-            <td>
-              Date
-            </td>
-            <td>
+            <th>
+              <p>
+                Name
+              </p>
+            </th>
+            <th>
+              <p>
+                Amount
+              </p>
+            </th>
+            <th>
+              <p>
+                Date
+              </p>
+            </th>
+            <th>
               &nbsp;
-            </td>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -38,16 +46,20 @@
               {{expense.transactiondate}}
             </td>
             <td>
-              <span><button type="submit" data-toggle="modal" data-target="#editModal">EDIT</button>&nbsp;&nbsp;<button type="submit" ng-click="deleteExpense(expense.id)">DELETE</button>
+              <span><button type="submit" data-toggle="modal" data-target="#editModal" class="btn btn-default" ng-click="openEditPopUp(expense.id)">EDIT</button>&nbsp;&nbsp;<button type="submit" class="btn btn-default" ng-click="deleteExpense(expense.id)">DELETE</button>
               </span>
             </td>
           </tr>
         </tbody>
       </table>
-      <button type="submit" data-toggle="modal" data-target="#addModal">Add</button>
+      <button type="submit" data-toggle="modal" data-target="#addModal" class="btn btn-default">Add Data</button>
+      <button type="submit" class="btn btn-default">Export to PDF</button>
 
-      <canvas class="chart chart-bar" chart-data="data" chart-labels="labels"
-      	chart-series="series" chart-click="onClick"></canvas>
+        <div>
+          <h4>Expense chart by date (unsorted)</h4>
+          <canvas id="chart" class="chart chart-line" chart-data="data" chart-labels="labels"
+          	chart-series="series" chart-click="onClick"></canvas>
+        </div>
       <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -56,11 +68,34 @@
               <h4 class="modal-title" id="myModalLabel">Edit Expense</h4>
             </div>
             <div class="modal-body">
-              ...
+              <div class="row">
+                <div class="col-xs-6">
+                  Name:
+                </div>
+                <div class="col-xs-6">
+                  <input type="text" ng-model="edit.name" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  Amount:
+                </div>
+                <div class="col-xs-6">
+                  <input type="text" ng-model="edit.amount" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-6">
+                  Date:
+                </div>
+                <div class="col-xs-6">
+                  <input type="text" ng-model="edit.transactiondate" />
+                </div>
+              </div>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-primary" ng-click="editExpense(edit.id)">Save changes</button>
             </div>
           </div>
         </div>

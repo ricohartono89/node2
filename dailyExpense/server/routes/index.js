@@ -3,7 +3,8 @@ var router = express.Router();
 var pg = require('pg');
 var path = require('path');
 var connectionString = require(path.join(__dirname,'../','../server','config'));
-
+var phantom = require('phantom');
+var lxDocument = require('lx-pdf')(require(path.join(__dirname,'../','../server','template.json')));
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.sendFile(path.join(__dirname,'../','../','client','views','index.html'));
@@ -57,6 +58,30 @@ router.get('/api/common/expense',function(req,res){
   });
 });
 
+router.get('/api/common/expense/:expense_id',function(req,res){
+  var results=[];
+  var id = req.params.expense_id;
+
+  pg.connect(connectionString,function(err,client,done){
+    if(err){
+      done();
+      console.log(err);
+      return res.status(500).json({success:false,data:err});
+    }
+
+    client.query("SELECT * FROM expenses WHERE id=($1)",[id]);
+    var query = client.query("SELECT * FROM expenses WHERE id=($1)",[id]);
+    query.on('row',function(row){
+      results.push(row);
+    });
+    query.on('end',function(){
+      done();
+      return res.json(results);
+    });
+  });
+});
+
+
 router.put('/api/common/expense/:expense_id',function(req,res){
   var results=[];
   var id = req.params.expense_id;
@@ -105,6 +130,10 @@ router.delete('/api/common/expense/:expense_id',function(req,res){
       return res.json(results);
     });
   });
+});
+
+router.get('/api/common/pdf',function(req,res){
+  phantom.create(['--ignore-ssl-errors=yes','--load-mages=no'])
 })
 
 module.exports = router;
